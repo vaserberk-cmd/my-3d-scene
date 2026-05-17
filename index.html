@@ -1,0 +1,57 @@
+<!-- Подключение плеера Google Model-Viewer -->
+<script type="module" src="https://googleapis.com"></script>
+
+<style>
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
+  model-viewer { width: 100%; height: 100vh; background-color: #edeef0; }
+  
+  /* Элемент загрузки, пока качается тяжелый файл */
+  #lazy-load-poster { position: absolute; left: 0; right: 0; top: 0; bottom: 0; background-color: #f5f5f5; display: flex; justify-content: center; align-items: center; font-family: sans-serif; color: #555; font-size: 16px; }
+  #button-load { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+
+  /* Стилизация круглых меток */
+  .Hotspot { background: #4285f4; border-radius: 50%; border: 2px solid #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.4); cursor: pointer; height: 26px; width: 26px; padding: 0; transition: transform 0.2s; }
+  .Hotspot:hover { transform: scale(1.2); }
+  .Hotspot:not([data-visible]) { display: none; }
+  
+  model-viewer { counter-reset: hotspot-counter; }
+  .Hotspot::before { counter-increment: hotspot-counter; content: counter(hotspot-counter); color: white; font-weight: bold; font-family: sans-serif; font-size: 13px; display: flex; justify-content: center; align-items: center; height: 100%; }
+</style>
+
+<!-- Используем reveal="interaction" чтобы страница не зависала при старте -->
+<model-viewer id="camera-move" src="https://github.com" camera-controls touch-action="pan-y" interpolation-decay="30" reveal="interaction">
+  
+  <!-- Заставка, которая видна до клика пользователя -->
+  <div slot="poster" id="lazy-load-poster">
+    <button id="button-load">Загрузить 3D экскурсию</button>
+  </div>
+
+  <!-- Ваши точки перемещения -->
+  <button class="Hotspot" slot="hotspot-1" data-position="-34.947573330132315m 12.456165000529634m 47.15017691394852m" data-normal="1.0649136421435864e-7m 0.9999999999999869m 1.2353706859832257e-7m" data-orbit="-45deg 75deg 10m" data-target="-34.94m 12.45m 47.15m" data-visibility-attribute="visible"></button>
+  <button class="Hotspot" slot="hotspot-2" data-position="-25.53525999321176m 9.660190476529515m 33.76698621532773m" data-normal="0.000003600768128308172m 0.500002000816028m -0.866024248602199m" data-orbit="20deg 60deg 15m" data-target="-25.53m 9.66m 33.76m" data-visibility-attribute="visible"></button>
+  <button class="Hotspot" slot="hotspot-3" data-position="-5.563054588428955m 9.024001679342902m 47.12362218856819m" data-normal="-1.7881397340600826e-7m -2.3841855423255492e-7m -0.9999999999999557m" data-orbit="90deg 80deg 12m" data-target="-5.56m 9.02m 47.12m" data-visibility-attribute="visible"></button>
+  <button class="Hotspot" slot="hotspot-4" data-position="-5.36309012267805m 8.774628390884628m 11.180653330106814m" data-normal="0m -0.9999999999999911m -1.3435883843274954e-7m" data-orbit="120deg 70deg 8m" data-target="-5.36m 8.77m 11.18m" data-visibility-attribute="visible"></button>
+  <button class="Hotspot" slot="hotspot-5" data-position="-2.305311601603793m 7.1406581523733745m -1.7632745567980823m" data-normal="0m 0.5777160118653523m -0.8162378388891269m" data-orbit="0deg 45deg 20m" data-target="-2.30m 7.14m -1.76m" data-visibility-attribute="visible"></button>
+
+</model-viewer>
+
+<script>
+  const modelViewer = document.querySelector("#camera-move");
+
+  const navigateToHotspot = (hotspot) => {
+    if (hotspot.dataset.target) modelViewer.cameraTarget = hotspot.dataset.target;
+    if (hotspot.dataset.orbit) modelViewer.cameraOrbit = hotspot.dataset.orbit;
+  };
+
+  modelViewer.querySelectorAll('.Hotspot').forEach((hotspot) => {
+    hotspot.addEventListener('click', () => navigateToHotspot(hotspot));
+  });
+
+  window.addEventListener('keydown', (event) => {
+    if (event.key >= '1' && event.key <= '5') {
+      const index = parseInt(event.key) - 1;
+      const hotspots = modelViewer.querySelectorAll('.Hotspot');
+      if (hotspots[index]) navigateToHotspot(hotspots[index]);
+    }
+  });
+</script>
